@@ -1,3 +1,5 @@
+
+
 async function sprintChallenge5() { // Note the async keyword so you can use `await` inside sprintChallenge5
   // 👇 WORK ONLY BELOW THIS LINE 👇
   // 👇 WORK ONLY BELOW THIS LINE 👇
@@ -9,16 +11,57 @@ async function sprintChallenge5() { // Note the async keyword so you can use `aw
   // ❗ Use the variables `mentors` and `learners` to store the data.
   // ❗ Use the await keyword when using axios.
 
+  
+  
   let mentors = [] // fix this
   let learners = [] // fix this
+  let mentorLookup = {};
 
-  // 👆 ==================== TASK 1 END ====================== 👆
+
+  try {
+
+  
+const learnersResponse = await axios.get('http://localhost:3003/api/learners');
+const mentorsResponse = await axios.get('http://localhost:3003/api/mentors');
+  
+
+ 
+
+  if (learnersResponse.data && mentorsResponse.data) {
+    learners = learnersResponse.data;
+    mentors = mentorsResponse.data;
+
+    mentorLookup = mentors.reduce((acc, mentor) => {
+      acc[mentor.id] = `${mentor.firstName} ${mentor.lastName}`;
+      return acc;
+    }, {});
+
+    // Debug: Log the raw data and lookup table
+    console.log('Raw Learners Data:', learners);
+    console.log('Mentor Lookup Table:', mentorLookup);
+
+  
+    
+
+    
+  } else {
+    throw new Error("Empty response data");
+  }
+} catch (error) {
+  console.error('Error fetching data:', error);
+  return; // Exit the function if there was an error fetching data
+}
+
+
+
+ // 👆 ==================== TASK 1 END ====================== 👆
 
   // 👇 ==================== TASK 2 START ==================== 👇
 
   // 🧠 Combine learners and mentors.
   // ❗ At this point the learner objects only have the mentors' IDs.
   // ❗ Fix the `learners` array so that each learner ends up with this exact structure:
+
   // {
   //   id: 6,
   //   fullName: "Bob Johnson",
@@ -28,6 +71,7 @@ async function sprintChallenge5() { // Note the async keyword so you can use `aw
   //     "Grace Hopper"
   //   ]`
   // }
+  
 
   // 👆 ==================== TASK 2 END ====================== 👆
 
@@ -39,6 +83,7 @@ async function sprintChallenge5() { // Note the async keyword so you can use `aw
   // 👇 ==================== TASK 3 START ==================== 👇
 
   for (let learner of learners) { // looping over each learner object
+    console.log('Processing Learner:', learner.fullName, 'Mentor IDs:', learner.mentorIds);
 
     // 🧠 Flesh out the elements that describe each learner
     // ❗ Give the elements below their (initial) classes, textContent and proper nesting.
@@ -52,6 +97,38 @@ async function sprintChallenge5() { // Note the async keyword so you can use `aw
     const email = document.createElement('div')
     const mentorsHeading = document.createElement('h4')
     const mentorsList = document.createElement('ul')
+
+      card.className = 'card';
+      heading.textContent = learner.fullName;
+      email.className = 'email';
+      email.textContent = learner.email;
+      mentorsHeading.textContent = 'Mentors';
+      mentorsHeading.className = 'closed';
+
+      mentorsList.innerHTML = '';
+      
+      if (Array.isArray(learner.mentors) && learner.mentors.length > 0) {
+        learner.mentors.forEach(mentorId => {
+          const mentorName = mentorLookup[mentorId];
+          const li = document.createElement('li');
+          li.textContent = mentorName ? mentorName : 'Unknown Mentor'; // Handle case if mentorId is not found
+          mentorsList.appendChild(li);
+        });
+      } else {
+        const li = document.createElement('li');
+        li.textContent = 'No mentors available';
+        mentorsList.appendChild(li);
+      }
+  
+      card.appendChild(heading);
+      card.appendChild(email);
+      card.appendChild(mentorsHeading);
+      card.appendChild(mentorsList);
+      
+      
+
+      
+    
 
     // 👆 ==================== TASK 3 END ====================== 👆
 
